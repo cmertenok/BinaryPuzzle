@@ -1,5 +1,5 @@
 public class Board {
-    private static final int BOARD_SIZE = 8;
+    public static final int BOARD_SIZE = 8;
     private Cell[][] gameBoard;
 
     public Board() {
@@ -14,6 +14,10 @@ public class Board {
 
     public void setCellValue(int row, int col, String value) {
         this.gameBoard[row][col].setValue(value);
+    }
+
+    public boolean isEmpty(int row, int col) {
+        return (gameBoard[row][col].equals('0') || gameBoard[row][col].equals('1')) ? true : false;
     }
 
     public void createBorder() {

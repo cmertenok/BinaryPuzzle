@@ -14,9 +14,10 @@ public class Main {
 //                "| |  | |_| |/ / / /| |  __/     \n" +
 //                "\\_|   \\__,_/___/___|_|\\___|     \n");
 
-//        Board board = new Board();
-//        board.printBoard();
-        GameMenu menu = new GameMenu();
-        menu.handleMenu();
+        Board board = new Board();
+        Player player = new Player(1, "Artem");
+//        player.makeMove(2, 4, "0");
+        board.printBoard();
+
     }
 }
