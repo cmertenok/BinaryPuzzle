@@ -6,10 +6,8 @@ public class Player {
     private int score;
 
     private Board board;
-    private final Scanner scanner = new Scanner(System.in);
 
-    public Player(int playerID, String name) {
-        this.playerID = playerID;
+    public Player(String name) {
         this.name = name;
         this.score = 0;
     }
@@ -36,7 +34,7 @@ public class Player {
 
     public void makeMove(int row, int col, String value) {
         boolean validMove = false;
-        value = scanner.nextLine();
+        //value = scanner.nextLine();
         do {
             if ((row < 0 || row > Board.BOARD_SIZE) || (col < 0 || col > Board.BOARD_SIZE)) {
                 System.out.println("Wrong cell!");

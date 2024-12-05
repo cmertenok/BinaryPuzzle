@@ -4,7 +4,7 @@ public class Cell {
     private String value;
 
     public Cell() {
-        this.value = "";
+        this.value = "_";
     }
 
     public int getRow() {
@@ -23,8 +23,12 @@ public class Cell {
         this.value = value;
     }
 
+    public boolean isEmpty() {
+        return this.value.equals("_");
+    }
+
     @Override
     public String toString() {
-        return String.format("Cell(%d,%d)\nValue: %s", getRow(), getColumn(), getValue());
+        return String.format("Value: %s", getValue());
     }
 }
