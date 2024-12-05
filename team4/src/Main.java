@@ -12,6 +12,7 @@ public class Main {
 //        System.out.println(board.getCellValue(2, 5).isEmpty());
 //        System.out.println(board.getCellValue(2, 3).isEmpty());
 //
+//        System.out.println(board.toString());
 //        board.printBoard();
 
         GameMenu gameMenu = new GameMenu();

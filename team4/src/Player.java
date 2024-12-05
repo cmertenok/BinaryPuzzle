@@ -1,11 +1,8 @@
-import java.util.Scanner;
 
 public class Player {
     private int playerID;
     private String name;
     private int score;
-
-    private Board board;
 
     public Player(String name) {
         this.name = name;
@@ -33,21 +30,7 @@ public class Player {
     }
 
     public void makeMove(int row, int col, String value) {
-        boolean validMove = false;
-        //value = scanner.nextLine();
-        do {
-            if ((row < 0 || row > Board.BOARD_SIZE) || (col < 0 || col > Board.BOARD_SIZE)) {
-                System.out.println("Wrong cell!");
-            } else {
-                if(value.equals("1") || value.equals("2")) {
-                    board.setCellValue(row, col, value);
-                    increaseScore(10);
-                    validMove = true;
-                } else {
-                    System.out.println("Invalid character!");
-                }
-            }
-        } while (!validMove);
+
     }
 
     public void increaseScore(int points) {
@@ -56,6 +39,6 @@ public class Player {
 
     @Override
     public String toString() {
-        return String.format("%s - %d", name, score);
+        return String.format("Name: %s\nScore: %d", name, score);
     }
 }

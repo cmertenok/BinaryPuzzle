@@ -45,21 +45,23 @@ public class Board {
 
     @Override
     public String toString() {
+
         StringBuilder sb = new StringBuilder();
-        sb.append("   ");
+        sb.append("\n   ");
 
         for (int i = 1; i <= BOARD_SIZE; i++) {
-            sb.append(i).append("  ");
+            sb.append(i + "  ");
         }
         sb.append("\n");
 
         for (int i = 1; i <= BOARD_SIZE; i++) {
-            sb.append(i).append("  ");
+            sb.append(i + "  ");
             for (int j = 1; j <= BOARD_SIZE; j++) {
-                sb.append(gameBoard[i][j].getValue()).append("  ");
+                sb.append(gameBoard[i][j].getValue() + "  ");
             }
             sb.append("\n");
         }
+
         return sb.toString();
     }
 }
