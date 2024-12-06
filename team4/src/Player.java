@@ -39,6 +39,6 @@ public class Player {
 
     @Override
     public String toString() {
-        return String.format("Name: %s\nScore: %d", name, score);
+        return String.format("Score: %d", score);
     }
 }

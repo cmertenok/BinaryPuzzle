@@ -90,9 +90,6 @@ public class GameMenu {
                         System.out.println("Goodbye!");
                         validInput = false;
                         break;
-                    default:
-                        System.out.println("Invalid input! Please enter number from 1 to 5.");
-                        keyboard.nextLine();
                     }
             } catch (Exception e) {
                 System.out.println("Invalid input! Please enter number from 1 to 5.");
