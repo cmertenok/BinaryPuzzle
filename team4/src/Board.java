@@ -27,22 +27,6 @@ public class Board {
         //TODO implement saving board
     }
 
-//    public void printBoard() {
-//        System.out.print("\n   ");
-//        for (int i = 1; i <= BOARD_SIZE; i++) {
-//            System.out.print(i + "  ");
-//        }
-//        System.out.println();
-//
-//        for (int i = 1; i <= BOARD_SIZE; i++) {
-//            System.out.print(i + "  ");
-//            for (int j = 1; j <= BOARD_SIZE; j++) {
-//                System.out.print(gameBoard[i][j].getValue() + "  ");
-//            }
-//            System.out.println();
-//        }
-//    }
-
     @Override
     public String toString() {
 
