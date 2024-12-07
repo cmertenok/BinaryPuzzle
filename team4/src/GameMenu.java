@@ -6,17 +6,25 @@ public class GameMenu {
     private GameSession gameSession;
     private int choice;
 
+    public static final String RESET = "\u001B[0m";
+    public static final String RED = "\u001B[31m";
+    public static final String GREEN = "\u001B[32m";
+    public static final String YELLOW = "\u001B[33m";
+    public static final String BLUE = "\u001B[34m";
+    public static final String CYAN = "\u001B[36m";
+
     private final Scanner keyboard = new Scanner(System.in);
 
     public void start() {
         boolean validateInput = true;
 
         while (validateInput) {
-            System.out.println("╔══════ Binary Puzzle ═════╗");
-            System.out.println("║        1. Sign up        ║");
-            System.out.println("║        2. Exit           ║");
-            System.out.print  ("╚══════════════════════════╝\n");
-            System.out.print("Your choice: ");
+            System.out.print( YELLOW +
+                             "╔══════ Binary Puzzle ═════╗\n" +
+                             "║        1. Sign up        ║\n" +
+                             "║        2. Exit           ║\n" +
+                             "╚══════════════════════════╝\n" + RESET);
+            System.out.print(BLUE + "Your choice: " + RESET);
 
             try {
                 choice = keyboard.nextInt();
@@ -26,13 +34,13 @@ public class GameMenu {
                     handleEnterName();
                     validateInput = false;
                 } else if (choice == 2) {
-                    System.out.println("Goodbye!");
+                    System.out.println(BLUE + "Goodbye!" + RESET);
                     return;
                 } else {
-                    System.out.println("Invalid input! Please enter a number 1 or 2.");
+                    System.out.println(RED + "Invalid input! Please enter a number 1 or 2." + RESET);
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Invalid input! Please enter a number 1 or 2.");
+                System.out.println(RED + "Invalid input! Please enter a number 1 or 2." + RESET);
                 keyboard.nextLine();
             }
         }
@@ -44,16 +52,16 @@ public class GameMenu {
         boolean validateInput = true;
 
         while (validateInput) {
-            System.out.print("Enter your name: ");
+            System.out.print(BLUE + "Enter your name: " + RESET);
             String name = keyboard.nextLine();
 
             if (name == null || name.trim().isEmpty()) {
-                System.out.println("Username can't be empty!");
-            } else if (name.length() < 3) {
-                System.out.println("Username can't be less than 3 characters!");
+                System.out.println(RED + "Invalid name! Name can`t be empty!" + RESET);
+            } else if (name.length() < 3 || name.length() > 25) {
+                System.out.println(RED + "Invalid name! The length of the name should be between 3 and 25 characters." + RESET);
             } else {
                 player = new Player(name);
-                System.out.printf("\nWelcome, %s!", player.getName());
+                System.out.print(BLUE + "Welcome, " + GREEN + player.getName() + BLUE + "\n" + RESET);
                 validateInput = false;
             }
         }
@@ -66,7 +74,7 @@ public class GameMenu {
             displayMainMenu();
 
             try {
-                System.out.print("Your choice: ");
+                System.out.print(BLUE + "Your choice: " + RESET);
                 choice = keyboard.nextInt();
                 keyboard.nextLine();
 
@@ -87,34 +95,35 @@ public class GameMenu {
                         displayRules();
                         break;
                     case 5:
-                        System.out.println("Goodbye!");
+                        System.out.println(BLUE + "Goodbye!" + RESET);
                         validInput = false;
                         break;
+                    default:
+                        System.out.println(RED + "Invalid input! Please enter number from 1 to 5." + RESET);
                     }
             } catch (Exception e) {
-                System.out.println("Invalid input! Please enter number from 1 to 5.");
+                System.out.println(RED + "Invalid input! Please enter number from 1 to 5." + RESET);
                 keyboard.nextLine();
             }
         }
     }
 
     public void displayMainMenu() {
-        System.out.println();
-        System.out.println("╔══════ Binary Puzzle ═════╗");
-        System.out.println("║     1. New Game          ║");
-        System.out.println("║     2. Continue Game     ║");
-        System.out.println("║     3. LeaderBoard       ║");
-        System.out.println("║     4. Rules             ║");
-        System.out.println("║     5. Exit              ║");
-        System.out.print  ("╚══════════════════════════╝\n");
+        System.out.println(YELLOW + "\n╔══════ Binary Puzzle ═════╗\n" +
+                                      "║     1. New Game          ║\n" +
+                                      "║     2. Continue Game     ║\n" +
+                                      "║     3. LeaderBoard       ║\n" +
+                                      "║     4. Rules             ║\n" +
+                                      "║     5. Exit              ║\n" +
+                                      "╚══════════════════════════╝  " + RESET);
     }
 
     public void displayRules() {
-        System.out.println("╔════════════════════════ How to Play ══════════════════════════╗");
-        System.out.println("║   1. Fill the grid with 0s and 1s.                            ║");
-        System.out.println("║   2. No more than two of the same number in a row or column.  ║");
-        System.out.println("║   3. Equal numbers of 0s and 1s in each row and column.       ║");
-        System.out.println("║   4. Rows and columns must be unique.                         ║");
-        System.out.print  ("╚═══════════════════════════════════════════════════════════════╝\n");
+        System.out.println(CYAN +   "╔════════════════════════ How to Play ══════════════════════════╗\n" +
+                                    "║   1. Fill the grid with 0s and 1s.                            ║\n" +
+                                    "║   2. No more than two of the same number in a row or column.  ║\n" +
+                                    "║   3. Equal numbers of 0s and 1s in each row and column.       ║\n" +
+                                    "║   4. Rows and columns must be unique.                         ║\n" +
+                                    "╚═══════════════════════════════════════════════════════════════╝"   + RESET);
     }
 }
