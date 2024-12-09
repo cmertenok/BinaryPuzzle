@@ -2,9 +2,11 @@ public class Cell {
     private int row;
     private int column;
     private String value;
+    private boolean isLocked;
 
     public Cell() {
         this.value = "_";
+        this.isLocked = false;
     }
 
     public int getRow() {
@@ -20,7 +22,18 @@ public class Cell {
     }
 
     public void setValue(String value) {
+        if (isLocked) {
+            return;
+        }
         this.value = value;
+    }
+
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    public void setLocked(boolean locked) {
+        isLocked = locked;
     }
 
     public boolean isEmpty() {
@@ -29,6 +42,6 @@ public class Cell {
 
     @Override
     public String toString() {
-        return String.format("Value: %s", getValue());
+        return String.format("%s", getValue());
     }
 }
