@@ -80,8 +80,8 @@ public class GameMenu {
 
                 switch (choice) {
                     case 1:
-                        System.out.println("Starting a new game...");
-                        // TODO Staring new game
+                        startNewGame();
+                        validInput = false;
                         break;
                     case 2:
                         System.out.println("Continuing the game...");
@@ -108,6 +108,32 @@ public class GameMenu {
         }
     }
 
+    public void startNewGame() {
+        gameSession = new GameSession();
+        System.out.println(player.toString());
+        System.out.print(gameSession.getBoard());
+
+        while (!gameSession.isBoardComplete()) {
+            boolean playerContinues = player.makeMove(gameSession.getBoard());
+            if (!playerContinues) {
+                return;
+            }
+
+            System.out.println(player.toString());
+            System.out.println(gameSession.getBoard());
+        }
+
+        if(gameSession.validateAmount() && gameSession.validateSequence() && gameSession.validateUniqueness()) {
+            System.out.println(GREEN + "Congratulations!\n" + "You solved the puzzle in " +
+                    RED + player.getMovesAmount() + GREEN + " steps!" + RESET + "\uD83D\uDE00");
+            handleMainMenu();
+        } else {
+            System.out.println(RED + "Unfortunately you lose!" + RESET + "\uD83D\uDE22");
+            handleMainMenu();
+        }
+
+    }
+
     public void displayMainMenu() {
         System.out.println(YELLOW + "\n╔══════ Binary Puzzle ═════╗\n" +
                                       "║     1. New Game          ║\n" +
@@ -125,5 +151,9 @@ public class GameMenu {
                                     "║   3. Equal numbers of 0s and 1s in each row and column.       ║\n" +
                                     "║   4. Rows and columns must be unique.                         ║\n" +
                                     "╚═══════════════════════════════════════════════════════════════╝"   + RESET);
+    }
+
+    public void displayLeaderboard() {
+        //TODO display LeaderBoard
     }
 }

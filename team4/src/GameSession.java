@@ -1,4 +1,5 @@
 import java.time.LocalDateTime;
+import java.util.HashSet;
 
 public class GameSession {
     private int gameID;
@@ -11,6 +12,113 @@ public class GameSession {
         this.board = new Board();
         this.startTime = LocalDateTime.now();
     }
+
+    public int getGameID() {
+        return gameID;
+    }
+
+    public void setGameID(int gameID) {
+        this.gameID = gameID;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public Board getBoard() {
+        return board;
+    }
+
+    public boolean isBoardComplete() {
+        for (int i = 1; i <= Board.BOARD_SIZE; i++) {
+            for (int j = 1; j <= Board.BOARD_SIZE; j++) {
+                if (board.getCellValue(i, j).isEmpty()) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public String removeColor(int row, int col) {
+        String value = board.getCellValue(row, col) + "";
+        return value.substring(5, value.length() - 4);
+    }
+
+    public boolean validateAmount() {
+        for (int i = 1; i <= Board.BOARD_SIZE; i++) {
+            int rowZeroCount = 0;
+            int rowOneCount = 0;
+            int colZeroCount = 0;
+            int colOneCount = 0;
+
+            for (int j = 1; j <= Board.BOARD_SIZE; j++) {
+                if (removeColor(i, j).equals("0")) {
+                    rowZeroCount++;
+                } else if (removeColor(i, j).equals("1")) {
+                    rowOneCount++;
+                }
+
+                if (removeColor(j, i).equals("0")) {
+                    colZeroCount++;
+                } else if (removeColor(j, i).equals("1")) {
+                    colOneCount++;
+                }
+            }
+
+            if (rowZeroCount != rowOneCount || colZeroCount != colOneCount) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean validateSequence() {
+        for (int i = 1; i <= Board.BOARD_SIZE; i++) {
+            for (int j = 1; j <= Board.BOARD_SIZE - 2; j++) {
+                if (removeColor(i, j) == removeColor(i, j + 1) &&
+                    removeColor(i, j) == removeColor(i, j + 2)) {
+                    return false;
+                }
+
+                if (removeColor(j, i) == removeColor(j + 1, i) &&
+                    removeColor(j, i) == removeColor(j + 2, i)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public boolean validateUniqueness() {
+        HashSet<String> uniqueRows = new HashSet<>();
+        HashSet<String> uniqueColumns = new HashSet<>();
+
+        for (int i = 1; i <= Board.BOARD_SIZE; i++) {
+            StringBuilder row = new StringBuilder();
+            StringBuilder col = new StringBuilder();
+
+            for (int j = 1; j <= Board.BOARD_SIZE; j++) {
+                row.append(removeColor(i, j));
+                col.append(removeColor(j, i));
+            }
+
+            uniqueRows.add(row.toString());
+            uniqueColumns.add(col.toString());
+        }
+
+        return (uniqueColumns.size() == Board.BOARD_SIZE) && (uniqueRows.size() == Board.BOARD_SIZE);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("GameID: %d, Date %s", gameID, startTime);
+    }
 }
-
-
