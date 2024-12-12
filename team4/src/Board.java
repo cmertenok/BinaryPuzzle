@@ -1,7 +1,7 @@
 import java.util.Random;
 
 public class Board {
-    public static final int BOARD_SIZE = 8;
+    public static final int BOARD_SIZE = 4;
     public Cell[][] gameBoard;
 
     private final Random rand = new Random();

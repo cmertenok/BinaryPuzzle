@@ -1,5 +1,6 @@
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Set;
 
 public class GameSession {
     private int gameID;
@@ -98,8 +99,8 @@ public class GameSession {
     }
 
     public boolean validateUniqueness() {
-        HashSet<String> uniqueRows = new HashSet<>();
-        HashSet<String> uniqueColumns = new HashSet<>();
+        Set<String> uniqueRows = new HashSet<>();
+        Set<String> uniqueColumns = new HashSet<>();
 
         for (int i = 1; i <= Board.BOARD_SIZE; i++) {
             StringBuilder row = new StringBuilder();
