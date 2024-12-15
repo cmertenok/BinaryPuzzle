@@ -28,7 +28,8 @@ public class GameMenu {
                     "╚══════════════════════════╝\n" + RESET);
             System.out.print(BLUE + "Your choice: " + RESET);
 
-            try (Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);)  {
+            try {
+                Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
                 choice = keyboard.nextInt();
                 keyboard.nextLine();
 
