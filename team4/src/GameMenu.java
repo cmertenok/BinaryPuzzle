@@ -1,3 +1,4 @@
+import java.sql.*;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -20,38 +21,46 @@ public class GameMenu {
 
         while (validateInput) {
             System.out.print( YELLOW +
-                             "╔══════ Binary Puzzle ═════╗\n" +
-                             "║        1. Sign up        ║\n" +
-                             "║        2. Exit           ║\n" +
-                             "╚══════════════════════════╝\n" + RESET);
+                    "╔══════ Binary Puzzle ═════╗\n" +
+                    "║        1. Sign up        ║\n" +
+                    "║        2. Sign in        ║\n" +
+                    "║        3. Exit           ║\n" +
+                    "╚══════════════════════════╝\n" + RESET);
             System.out.print(BLUE + "Your choice: " + RESET);
 
             try {
+                Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
                 choice = keyboard.nextInt();
                 keyboard.nextLine();
 
                 if (choice == 1) {
-                    handleEnterName();
+                    handleEnterName(connection, keyboard);
                     validateInput = false;
-                } else if (choice == 2) {
+                }else if (choice == 2) {
+                    handleSearchName(connection, keyboard);
+                    validateInput = false;
+                }else if (choice == 3) {
                     System.out.println(BLUE + "Goodbye!" + RESET);
                     return;
                 } else {
-                    System.out.println(RED + "Invalid input! Please enter a number 1 or 2." + RESET);
+                    System.out.println(RED + "Invalid input! Please enter a number from 1 to 3." + RESET);
                 }
+            } catch (SQLException e) {
+                System.out.println(RED + "Connection to DB failed." + RESET);
+//                e.printStackTrace();
             } catch (InputMismatchException e) {
-                System.out.println(RED + "Invalid input! Please enter a number 1 or 2." + RESET);
+                System.out.println(RED + "Invalid input! Please enter a number from 1 to 3." + RESET);
                 keyboard.nextLine();
             }
         }
-
         handleMainMenu();
     }
 
-    public void handleEnterName() {
+    public void handleEnterName(Connection connection, Scanner keyboard) throws SQLException {
         boolean validateInput = true;
 
         while (validateInput) {
+            System.out.println(BLUE + "Signing you up.");
             System.out.print(BLUE + "Enter your name: " + RESET);
             String name = keyboard.nextLine();
 
@@ -61,8 +70,49 @@ public class GameMenu {
                 System.out.println(RED + "Invalid name! The length of the name should be between 3 and 25 characters." + RESET);
             } else {
                 player = new Player(name);
-                System.out.print(BLUE + "Welcome, " + GREEN + player.getName() + BLUE + "\n" + RESET);
+                System.out.print(BLUE + "Welcome, " + GREEN + name + BLUE + "\n" + RESET);
                 validateInput = false;
+
+                System.out.print(GREEN + name + BLUE + " enter you country: " + RESET);
+                String country = keyboard.nextLine();
+
+                String insertQuery = "INSERT INTO players (player_name, player_country) VALUES ('" + name + "' ,'" + country + "')";
+                try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
+                    int rowsInserted = statement.executeUpdate();
+                    if (rowsInserted > 0) {
+                        System.out.println("Successfully signed up!");
+                    } else {
+                        System.out.println("Something went wrong!");
+                    }
+                }
+            }
+        }
+    }
+
+    public void handleSearchName(Connection connection, Scanner keyboard) throws SQLException {
+        System.out.println("List of an existing players: ");
+        String selectQuery = "SELECT * FROM players";
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(selectQuery);
+            while (resultSet.next()) {
+                int playerId = resultSet.getInt("player_id");
+                String name = resultSet.getString("player_name");
+                System.out.println(playerId + " " + name);
+            }
+        }
+        System.out.print("Enter your ID: ");
+        String id = keyboard.nextLine();
+        String selectIdQuery = "SELECT * FROM players WHERE player_id = '" + id + "'";
+        try (PreparedStatement statement = connection.prepareStatement(selectIdQuery)) {
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                String name = resultSet.getString("player_name");
+                String country = resultSet.getString("player_country");
+                System.out.println("Welcome back, " + name + "! From " + country + "!");
+                player = new Player(name);
+//                player = equals(player) ? null : new Player(name);
+            } else {
+                System.out.println("Wrong ID!");
             }
         }
     }
@@ -100,7 +150,7 @@ public class GameMenu {
                         break;
                     default:
                         System.out.println(RED + "Invalid input! Please enter number from 1 to 5." + RESET);
-                    }
+                }
             } catch (Exception e) {
                 System.out.println(RED + "Invalid input! Please enter number from 1 to 5." + RESET);
                 keyboard.nextLine();
@@ -136,21 +186,21 @@ public class GameMenu {
 
     public void displayMainMenu() {
         System.out.println(YELLOW + "\n╔══════ Binary Puzzle ═════╗\n" +
-                                      "║     1. New Game          ║\n" +
-                                      "║     2. Continue Game     ║\n" +
-                                      "║     3. LeaderBoard       ║\n" +
-                                      "║     4. Rules             ║\n" +
-                                      "║     5. Exit              ║\n" +
-                                      "╚══════════════════════════╝  " + RESET);
+                "║     1. New Game          ║\n" +
+                "║     2. Continue Game     ║\n" +
+                "║     3. LeaderBoard       ║\n" +
+                "║     4. Rules             ║\n" +
+                "║     5. Exit              ║\n" +
+                "╚══════════════════════════╝  " + RESET);
     }
 
     public void displayRules() {
-        System.out.println(CYAN +   "╔════════════════════════ How to Play ══════════════════════════╗\n" +
-                                    "║   1. Fill the grid with 0s and 1s.                            ║\n" +
-                                    "║   2. No more than two of the same number in a row or column.  ║\n" +
-                                    "║   3. Equal numbers of 0s and 1s in each row and column.       ║\n" +
-                                    "║   4. Rows and columns must be unique.                         ║\n" +
-                                    "╚═══════════════════════════════════════════════════════════════╝"   + RESET);
+        System.out.println(CYAN + "╔════════════════════════ How to Play ══════════════════════════╗\n" +
+                "║   1. Fill the grid with 0s and 1s.                            ║\n" +
+                "║   2. No more than two of the same number in a row or column.  ║\n" +
+                "║   3. Equal numbers of 0s and 1s in each row and column.       ║\n" +
+                "║   4. Rows and columns must be unique.                         ║\n" +
+                "╚═══════════════════════════════════════════════════════════════╝"   + RESET);
     }
 
     public void displayLeaderboard() {

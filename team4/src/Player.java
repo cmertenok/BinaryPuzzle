@@ -4,6 +4,7 @@ public class Player {
     private int playerID;
     private String name;
     private int moves;
+    private String country;
 
     private final Scanner keyboard = new Scanner(System.in);
 
@@ -24,6 +25,8 @@ public class Player {
         return name;
     }
 
+    public String getCountry() { return country; }
+
     public int getMovesAmount() {
         return moves;
     }
@@ -34,8 +37,8 @@ public class Player {
         while (!validMove) {
             try {
                 System.out.print(GameMenu.BLUE + "Enter the row (" + GameMenu.RED + "'exit' " +
-                                 GameMenu.BLUE + "to quit, or " + GameMenu.YELLOW + "'save' " +
-                                 GameMenu.BLUE + "to save game): " + GameMenu.RESET);
+                        GameMenu.BLUE + "to quit, or " + GameMenu.YELLOW + "'save' " +
+                        GameMenu.BLUE + "to save game): " + GameMenu.RESET);
                 String input = keyboard.nextLine().trim().toLowerCase();
 
                 if (input.equals("exit")) {
@@ -54,7 +57,7 @@ public class Player {
                 int col = Integer.parseInt(keyboard.nextLine().trim());
 
                 System.out.print(GameMenu.BLUE + "Enter the value (" + GameMenu.RED + "0 " + GameMenu.BLUE + "or" +
-                                 GameMenu.RED + " 1" + GameMenu.BLUE + "):" + GameMenu.RESET);
+                        GameMenu.RED + " 1" + GameMenu.BLUE + "):" + GameMenu.RESET);
                 String value = GameMenu.BLUE + keyboard.nextLine().trim() + GameMenu.RESET;
 
                 if (!value.equals(GameMenu.BLUE + "0" + GameMenu.RESET) &&
@@ -74,7 +77,7 @@ public class Player {
                 }
             } catch (NumberFormatException e) {
                 System.out.println(GameMenu.RED + "Invalid input! Please enter a valid number or " +
-                                   GameMenu.GREEN + "'exit'" + GameMenu.RED + "/" + GameMenu.GREEN + "'save'" + GameMenu.RESET);
+                        GameMenu.GREEN + "'exit'" + GameMenu.RED + "/" + GameMenu.GREEN + "'save'" + GameMenu.RESET);
             }
         }
 
