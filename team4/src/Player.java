@@ -4,7 +4,6 @@ public class Player {
     private int playerID;
     private String name;
     private int moves;
-    private String country;
 
     private final Scanner keyboard = new Scanner(System.in);
 
@@ -20,12 +19,6 @@ public class Player {
     public void setPlayerID(int playerID) {
         this.playerID = playerID;
     }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getCountry() { return country; }
 
     public int getMovesAmount() {
         return moves;

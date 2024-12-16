@@ -1,4 +1,6 @@
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -47,7 +49,6 @@ public class GameMenu {
                 }
             } catch (SQLException e) {
                 System.out.println(RED + "Connection to DB failed." + RESET);
-//                e.printStackTrace();
             } catch (InputMismatchException e) {
                 System.out.println(RED + "Invalid input! Please enter a number from 1 to 3." + RESET);
                 keyboard.nextLine();
@@ -60,7 +61,6 @@ public class GameMenu {
         boolean validateInput = true;
 
         while (validateInput) {
-            System.out.println(BLUE + "Signing you up.");
             System.out.print(BLUE + "Enter your name: " + RESET);
             String name = keyboard.nextLine();
 
@@ -77,13 +77,24 @@ public class GameMenu {
                 String country = keyboard.nextLine();
 
                 String insertQuery = "INSERT INTO players (player_name, player_country) VALUES ('" + name + "' ,'" + country + "')";
-                try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
-                    int rowsInserted = statement.executeUpdate();
+                try {
+                    Statement statement = connection.createStatement();
+                    int rowsInserted = statement.executeUpdate(insertQuery, Statement.RETURN_GENERATED_KEYS);
                     if (rowsInserted > 0) {
-                        System.out.println("Successfully signed up!");
+                        ResultSet generatedKeys = statement.getGeneratedKeys();
+                        if (generatedKeys.next()) {
+                            int newPlayerId = generatedKeys.getInt(1);
+                            player.setPlayerID(newPlayerId);
+                            System.out.println(GREEN + "Successfully signed up! Your player ID is: " + newPlayerId + RESET);
+                        }
                     } else {
-                        System.out.println("Something went wrong!");
+                        System.out.println(RED + "Something went wrong!" + RESET);
                     }
+
+                    statement.close();
+                    connection.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
                 }
             }
         }
@@ -97,20 +108,21 @@ public class GameMenu {
             while (resultSet.next()) {
                 int playerId = resultSet.getInt("player_id");
                 String name = resultSet.getString("player_name");
-                System.out.println(playerId + " " + name);
+                System.out.printf("%-3s %5s%n", playerId, name);
             }
         }
+
         System.out.print("Enter your ID: ");
         String id = keyboard.nextLine();
         String selectIdQuery = "SELECT * FROM players WHERE player_id = '" + id + "'";
-        try (PreparedStatement statement = connection.prepareStatement(selectIdQuery)) {
-            ResultSet resultSet = statement.executeQuery();
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(selectIdQuery);
             if (resultSet.next()) {
                 String name = resultSet.getString("player_name");
                 String country = resultSet.getString("player_country");
                 System.out.println("Welcome back, " + name + "! From " + country + "!");
                 player = new Player(name);
-//                player = equals(player) ? null : new Player(name);
+                player.setPlayerID(Integer.parseInt(id));
             } else {
                 System.out.println("Wrong ID!");
             }
@@ -138,8 +150,7 @@ public class GameMenu {
                         // TODO Loading game
                         break;
                     case 3:
-                        System.out.println("Displaying Leaderboard...");
-                        // TODO Displaying Leaderboard
+                        displayLeaderboard();
                         break;
                     case 4:
                         displayRules();
@@ -160,6 +171,8 @@ public class GameMenu {
 
     public void startNewGame() {
         gameSession = new GameSession();
+        initializeGame();
+
         System.out.println(player.toString());
         System.out.print(gameSession.getBoard());
 
@@ -169,41 +182,175 @@ public class GameMenu {
                 return;
             }
 
+            try {
+                Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
+                Statement statement = connection.createStatement();
+
+                String updateScoreQuery = "UPDATE game_info SET score = " + player.getMovesAmount() + " WHERE game_id = " + gameSession.getGameID();
+                statement.executeUpdate(updateScoreQuery);
+
+                statement.close();
+                connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
             System.out.println(player.toString());
             System.out.println(gameSession.getBoard());
         }
 
-        if(gameSession.validateAmount() && gameSession.validateSequence() && gameSession.validateUniqueness()) {
-            System.out.println(GREEN + "Congratulations!\n" + "You solved the problem in " +
-                    RED + player.getMovesAmount() + GREEN + " steps!" + RESET + "\uD83D\uDE00");
-            handleMainMenu();
-        } else {
-            System.out.println(RED + "Unfortunately you lose!" + RESET + "\uD83D\uDE22");
-            handleMainMenu();
-        }
+        try {
+            Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
+            Statement statement = connection.createStatement();
 
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            String endDate = LocalDateTime.now().format(formatter);
+
+            if (gameSession.validateAmount() && gameSession.validateSequence() && gameSession.validateUniqueness()) {
+                String updateStatusQuery = "UPDATE game_info SET game_outcome = 'Win', end_time = '" + endDate + "' WHERE game_id = " + gameSession.getGameID();
+                statement.executeUpdate(updateStatusQuery);
+
+                gameSession.setEndTime(LocalDateTime.now());
+                System.out.println(GREEN + "Congratulations!\n" + "You solved the problem in " +
+                        RED + player.getMovesAmount() + GREEN + " steps!" + RESET + "\uD83D\uDE00");
+            } else {
+                String updateStatusQuery = "UPDATE game_info SET game_outcome = 'Lose', end_time = '" + endDate + "' WHERE game_id = " + gameSession.getGameID();
+                statement.executeUpdate(updateStatusQuery);
+
+                gameSession.setEndTime(LocalDateTime.now());
+                System.out.println(RED + "Unfortunately you lose!" + RESET + "\uD83D\uDE22");
+            }
+
+            statement.close();
+            connection.close();
+
+            handleMainMenu();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void initializeGame() {
+        try {
+            Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            String startDate = LocalDateTime.now().format(formatter);
+            gameSession.setStartTime(LocalDateTime.now());
+
+            String insertGameQuery = "INSERT INTO game_info (player_id, start_time, score, session_duration) " +
+                    "VALUES (" + player.getPlayerID() + ", '" + startDate + "', 0, 0)";
+
+            Statement statement = connection.createStatement();
+            statement.executeUpdate(insertGameQuery, Statement.RETURN_GENERATED_KEYS);
+            ResultSet generatedKeys = statement.getGeneratedKeys();
+
+            if (generatedKeys.next()) {
+                int gameId = generatedKeys.getInt(1);
+                gameSession.setGameID(gameId);
+            }
+
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void displayMainMenu() {
         System.out.println(YELLOW + "\n╔══════ Binary Puzzle ═════╗\n" +
-                "║     1. New Game          ║\n" +
-                "║     2. Continue Game     ║\n" +
-                "║     3. LeaderBoard       ║\n" +
-                "║     4. Rules             ║\n" +
-                "║     5. Exit              ║\n" +
-                "╚══════════════════════════╝  " + RESET);
+                                      "║     1. New Game          ║\n" +
+                                      "║     2. Continue Game     ║\n" +
+                                      "║     3. LeaderBoard       ║\n" +
+                                      "║     4. Rules             ║\n" +
+                                      "║     5. Exit              ║\n" +
+                                      "╚══════════════════════════╝  " + RESET);
     }
 
     public void displayRules() {
         System.out.println(CYAN + "╔════════════════════════ How to Play ══════════════════════════╗\n" +
-                "║   1. Fill the grid with 0s and 1s.                            ║\n" +
-                "║   2. No more than two of the same number in a row or column.  ║\n" +
-                "║   3. Equal numbers of 0s and 1s in each row and column.       ║\n" +
-                "║   4. Rows and columns must be unique.                         ║\n" +
-                "╚═══════════════════════════════════════════════════════════════╝"   + RESET);
+                                  "║   1. Fill the grid with 0s and 1s.                            ║\n" +
+                                  "║   2. No more than two of the same number in a row or column.  ║\n" +
+                                  "║   3. Equal numbers of 0s and 1s in each row and column.       ║\n" +
+                                  "║   4. Rows and columns must be unique.                         ║\n" +
+                                  "╚═══════════════════════════════════════════════════════════════╝"   + RESET);
     }
 
     public void displayLeaderboard() {
-        //TODO display LeaderBoard
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println(YELLOW + "══════ LeaderBoard ═════" + RESET);
+        String showTop = "SELECT p.player_name, g.score\n" +
+                "FROM players p\n" +
+                "JOIN game_info g ON p.player_id = g.player_id\n" +
+                "WHERE UPPER(g.game_outcome) = 'WIN'\n" +
+                "ORDER BY g.score ASC\n" +
+                "FETCH FIRST 5 ROWS ONLY;";
+
+        try {
+            Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(showTop);
+            int place = 1;
+
+            while (resultSet.next()) {
+                String name = resultSet.getString("player_name");
+                int score = resultSet.getInt("score");
+
+                String formattedTop = String.format("%3d. ", place);
+                String formattedName = String.format("%-10s", name);
+                String formattedScore = String.format("%5d", score);
+
+                System.out.println(YELLOW + formattedTop + GREEN + formattedName + RESET + " " + RED + formattedScore + RESET);
+                place++;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        while (true) {
+            System.out.println(YELLOW + "Enter name to see more, or type " + RED + "'menu' " + YELLOW + "to return to menu: " + RESET);
+            String input = scanner.nextLine().trim();
+
+            if (input.toLowerCase().equals("menu")) {
+                handleMainMenu();
+                return;
+            }
+
+            String showPlayerStats = "SELECT g.score\n" +
+                    "FROM players p\n" +
+                    "JOIN game_info g on p.player_id = g.player_id\n" +
+                    "WHERE LOWER(p.player_name) ='" + input.toLowerCase() + "' AND UPPER(g.game_outcome) = 'WIN' \n" +
+                    "ORDER BY g.score ASC\n" +
+                    "FETCH FIRST 5 ROWS ONLY;";
+
+            try {
+                Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(showPlayerStats);
+
+                boolean hasResults = false;
+                int place = 1;
+
+                while (resultSet.next()) {
+                    hasResults = true;
+                    int score = resultSet.getInt("score");
+
+                    String formattedTop = String.format("%3d. ", place);
+                    String formattedScore = String.format("%5d", score);
+
+                    System.out.println(YELLOW + formattedTop + RED + formattedScore + RESET);
+                    place++;
+                }
+
+                if (!hasResults) {
+                    System.out.println(RED + "Player not found!" + RESET);
+                }
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

@@ -1,3 +1,4 @@
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -9,9 +10,7 @@ public class GameSession {
     private LocalDateTime endTime;
 
     public GameSession() {
-        this.gameID = -1;
         this.board = new Board();
-        this.startTime = LocalDateTime.now();
     }
 
     public int getGameID() {
@@ -20,6 +19,14 @@ public class GameSession {
 
     public void setGameID(int gameID) {
         this.gameID = gameID;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     public LocalDateTime getEndTime() {
@@ -33,6 +40,11 @@ public class GameSession {
     public Board getBoard() {
         return board;
     }
+
+    public long getDuration() {
+        Duration duration = Duration.between(startTime, endTime);
+        return duration.getSeconds();
+    };
 
     public boolean isBoardComplete() {
         for (int i = 1; i <= Board.BOARD_SIZE; i++) {
