@@ -1,15 +1,24 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Scanner;
 
 public class Player {
     private int playerID;
     private String name;
     private int moves;
+    private GameSession gameSession;
 
     private final Scanner keyboard = new Scanner(System.in);
 
     public Player(String name) {
         this.name = name;
         this.moves = 0;
+    }
+
+    public void setGameSession(GameSession gameSession) {
+        this.gameSession = gameSession;
     }
 
     public int getPlayerID() {
@@ -44,7 +53,8 @@ public class Player {
                 }
 
                 if (input.equals("save")) {
-                    System.out.println(GameMenu.YELLOW + "Game saved." + GameMenu.RESET);
+                    gameSession.getBoard().saveBoard(gameSession.getGameID(), this.playerID);
+                    System.out.println(GameMenu.GREEN + "Game has been saved!" + GameMenu.RESET);
                     return false;
                 }
 

@@ -3,7 +3,7 @@ import java.sql.*;
 public class DatabaseConnection {
     protected static final String url = "jdbc:postgresql://localhost:5432/ascii4";
     protected static final String user = "postgres";
-    protected static final String password = "student_1234";
+    protected static final String password = "Student_1234";
 
     public static void main() {
         try {
@@ -59,10 +59,12 @@ public class DatabaseConnection {
                     "    cell_row SMALLINT NOT NULL," +
                     "    cell_column SMALLINT NOT NULL," +
                     "    value VARCHAR(10) NOT NULL," +
-                    "    static BIT NOT NULL" +
+                    "    static INTEGER NOT NULL" +
                     ");");
+
             System.out.println("Table board_state created!");
-            statement.close(); connection.close();
+            statement.close();
+            connection.close();
 
             System.out.println("Connection closed!");
         } catch (SQLException exc) {

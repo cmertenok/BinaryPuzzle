@@ -146,8 +146,7 @@ public class GameMenu {
                         validInput = false;
                         break;
                     case 2:
-                        System.out.println("Continuing the game...");
-                        // TODO Loading game
+
                         break;
                     case 3:
                         displayLeaderboard();
@@ -171,6 +170,7 @@ public class GameMenu {
 
     public void startNewGame() {
         gameSession = new GameSession();
+        player.setGameSession(gameSession);
         initializeGame();
 
         System.out.println(player.toString());
@@ -222,6 +222,7 @@ public class GameMenu {
             }
 
             player.setMoves(0);
+
             statement.close();
             connection.close();
 
@@ -235,6 +236,7 @@ public class GameMenu {
     public void initializeGame() {
         try {
             Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
+            Statement statement = connection.createStatement();
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             String startDate = LocalDateTime.now().format(formatter);
@@ -243,7 +245,6 @@ public class GameMenu {
             String insertGameQuery = "INSERT INTO game_info (player_id, start_time, score, session_duration) " +
                     "VALUES (" + player.getPlayerID() + ", '" + startDate + "', 0, 0)";
 
-            Statement statement = connection.createStatement();
             statement.executeUpdate(insertGameQuery, Statement.RETURN_GENERATED_KEYS);
             ResultSet generatedKeys = statement.getGeneratedKeys();
 

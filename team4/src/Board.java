@@ -1,3 +1,7 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Random;
 
 public class Board {
@@ -51,12 +55,39 @@ public class Board {
         }
     }
 
-    public void loadBoard() {
-        //TODO implement loading board
+    public void saveBoard(int gameID, int playerID) {
+        try {
+            Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
+            Statement statement = connection.createStatement();
+            String deleteQuery = "DELETE FROM board_state\n" +
+                    "WHERE board_state.game_id IN (\n" +
+                    "    SELECT b.game_id\n" +
+                    "    FROM board_state b\n" +
+                    "    JOIN game_info g ON g.game_id = b.game_id\n" +
+                    "    WHERE g.player_id = " + playerID + ");";
+            statement.executeUpdate(deleteQuery);
+
+            for (int i = 1; i <= BOARD_SIZE; i++) {
+                for (int j = 1; j <= BOARD_SIZE; j++) {
+                    Cell cell = gameBoard[i][j];
+                    String cellValue = cell.getValue();
+                    int cellIsLocked = cell.isLocked() ? 1 : 0;
+
+                    String insertQuery = "INSERT INTO board_state (game_id, cell_row, cell_column, value, static) " +
+                                         "VALUES (" + gameID + ", " + i + ", " + j + ", '" + cellValue + "', " + cellIsLocked + ")";
+                    statement.executeUpdate(insertQuery);
+                }
+            }
+
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void saveBoard() {
-        //TODO implement saving board
+    public void loadBoard() {
+        //TODO implement loading board
     }
 
     @Override
