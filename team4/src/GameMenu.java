@@ -221,6 +221,7 @@ public class GameMenu {
                 System.out.println(RED + "Unfortunately you lose!" + RESET + "\uD83D\uDE22");
             }
 
+            player.setMoves(0);
             statement.close();
             connection.close();
 

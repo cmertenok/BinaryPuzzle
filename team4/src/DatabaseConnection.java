@@ -3,7 +3,7 @@ import java.sql.*;
 public class DatabaseConnection {
     protected static final String url = "jdbc:postgresql://localhost:5432/ascii4";
     protected static final String user = "postgres";
-    protected static final String password = "Student_1234";
+    protected static final String password = "student_1234";
 
     public static void main() {
         try {

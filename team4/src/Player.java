@@ -20,6 +20,10 @@ public class Player {
         this.playerID = playerID;
     }
 
+    public void setMoves(int moves) {
+        this.moves = moves;
+    }
+
     public int getMovesAmount() {
         return moves;
     }
