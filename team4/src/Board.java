@@ -55,16 +55,17 @@ public class Board {
         }
     }
 
-    public void saveBoard(int gameID, int playerID) {
+    public void saveBoard(int gameID) {
         try {
             Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
             Statement statement = connection.createStatement();
-            String deleteQuery = "DELETE FROM board_state\n" +
-                    "WHERE board_state.game_id IN (\n" +
-                    "    SELECT b.game_id\n" +
-                    "    FROM board_state b\n" +
-                    "    JOIN game_info g ON g.game_id = b.game_id\n" +
-                    "    WHERE g.player_id = " + playerID + ");";
+            String deleteQuery = "DELETE FROM board_state;";
+//            String deleteQuery = "DELETE FROM board_state\n" +
+//                    "WHERE game_id IN (\n" +
+//                    "    SELECT b.game_id\n" +
+//                    "    FROM board_state b\n" +
+//                    "    JOIN game_info g ON g.game_id = b.game_id\n" +
+//                    "    WHERE g.player_id = " + playerID + ");";
             statement.executeUpdate(deleteQuery);
 
             for (int i = 1; i <= BOARD_SIZE; i++) {

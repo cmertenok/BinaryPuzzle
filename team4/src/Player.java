@@ -53,7 +53,7 @@ public class Player {
                 }
 
                 if (input.equals("save")) {
-                    gameSession.getBoard().saveBoard(gameSession.getGameID(), this.playerID);
+                    gameSession.getBoard().saveBoard(gameSession.getGameID());
                     System.out.println(GameMenu.GREEN + "Game has been saved!" + GameMenu.RESET);
                     return false;
                 }
