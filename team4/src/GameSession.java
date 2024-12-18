@@ -1,3 +1,4 @@
+import java.sql.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -29,22 +30,39 @@ public class GameSession {
         this.endTime = endTime;
     }
 
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
-
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
-
     public Board getBoard() {
         return board;
     }
 
-    public long getDuration() {
-        Duration duration = Duration.between(startTime, endTime);
-        return duration.getSeconds();
-    };
+    public void setBoard(Board board) {
+        this.board = board;
+    }
+
+    public void updateSessionDuration() {
+        try {
+            Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
+            Statement statement = connection.createStatement();
+
+            String selectQuery = "SELECT session_duration FROM game_info WHERE game_id = " + gameID;
+            ResultSet resultSet = statement.executeQuery(selectQuery);
+            int currentDuration = 0;
+
+            if (resultSet.next()) {
+                currentDuration = resultSet.getInt("session_duration");
+            }
+
+            LocalDateTime now = LocalDateTime.now();
+            long newDuration = Duration.between(startTime, now).getSeconds();
+            int totalDuration = currentDuration + (int) newDuration;
+            String updateQuery = "UPDATE game_info SET session_duration = " + totalDuration + " WHERE game_id = " + gameID;
+            statement.executeUpdate(updateQuery);
+
+            endTime = now;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public boolean isBoardComplete() {
         for (int i = 1; i <= Board.BOARD_SIZE; i++) {
