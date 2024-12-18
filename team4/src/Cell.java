@@ -1,20 +1,10 @@
 public class Cell {
-    private int row;
-    private int column;
     private String value;
     private boolean isLocked;
 
     public Cell() {
         this.value = "_";
         this.isLocked = false;
-    }
-
-    public int getRow() {
-        return row;
-    }
-
-    public int getColumn() {
-        return column;
     }
 
     public String getValue() {

@@ -175,6 +175,7 @@ public class GameMenu {
         player.setGameSession(gameSession);
 
         if (board == null) {
+            gameSession.setStartTime(LocalDateTime.now());
             initializeGame();
         } else {
             int loadedGameID = getSavedGameID();
@@ -184,10 +185,12 @@ public class GameMenu {
                 ResultSet resultSet = statement.executeQuery("SELECT score FROM game_info WHERE game_id = " + loadedGameID + ";");
                 if (resultSet.next()) {
                     player.setMoves(resultSet.getInt("score"));
+                    gameSession.setStartTime(LocalDateTime.now());
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
+
             if (loadedGameID == -1) {
                 System.out.println(RED + "You don't have any saves!" + RESET);
                 return;
@@ -203,6 +206,7 @@ public class GameMenu {
         while (!gameSession.isBoardComplete()) {
             boolean playerContinues = player.makeMove(gameSession.getBoard());
             if (!playerContinues) {
+                gameSession.updateSessionDuration();
                 return;
             }
 
@@ -220,6 +224,9 @@ public class GameMenu {
             System.out.println(player.toString());
             System.out.println(gameSession.getBoard());
         }
+
+        gameSession.setEndTime(LocalDateTime.now());
+        gameSession.updateSessionDuration();
 
         try (Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
              Statement statement = connection.createStatement()) {
