@@ -24,11 +24,6 @@ public class DatabaseConnection {
                     "    player_country VARCHAR(30)" +
                     ");");
             System.out.println("Table players created!");
-//            statement.executeUpdate("INSERT INTO players (player_name, player_country) VALUES ('Ade','Belgium')");
-//            statement.executeUpdate("INSERT INTO players (player_name, player_country) VALUES ('Artem','Belgium')");
-//            statement.executeUpdate("INSERT INTO players (player_name, player_country) VALUES ('Anna','Luxembourg')");
-//            statement.executeUpdate("INSERT INTO players (player_name, player_country) VALUES ('Michael','Germany')");
-//            System.out.println("Data entered in table players");
             ResultSet resultSet = statement.executeQuery("SELECT player_name, player_country FROM players");
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS game_info(" +
                     "    game_id INTEGER" +
@@ -60,11 +55,9 @@ public class DatabaseConnection {
                     "    value VARCHAR(10) NOT NULL," +
                     "    static INTEGER NOT NULL" +
                     ");");
-
             System.out.println("Table board_state created!");
             statement.close();
             connection.close();
-
             System.out.println("Connection closed!");
         } catch (SQLException exc) {
             exc.printStackTrace();

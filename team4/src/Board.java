@@ -15,7 +15,7 @@ public class Board {
             }
         }
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 3; i++) {
             generateStartValues();
         }
     }
@@ -109,7 +109,6 @@ public class Board {
 
     @Override
     public String toString() {
-
         StringBuilder sb = new StringBuilder();
         sb.append("   ");
 
@@ -128,5 +127,4 @@ public class Board {
 
         return sb.toString();
     }
-
 }
