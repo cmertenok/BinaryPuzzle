@@ -82,9 +82,9 @@ public class Board {
             ResultSet resultSet = statement.executeQuery(selectQuery);
 
             while(resultSet.next()) {
+                String value = resultSet.getString("value");
                 int row = resultSet.getInt("cell_row");
                 int col = resultSet.getInt("cell_column");
-                String value = resultSet.getString("value");
                 int isStatic = resultSet.getInt("static");
 
                 Cell cell = gameBoard[row][col];

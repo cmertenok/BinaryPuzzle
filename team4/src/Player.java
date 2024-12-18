@@ -39,8 +39,8 @@ public class Player {
         while (!validMove) {
             try {
                 System.out.print(Color.BLUE + "Enter the row (" + Color.RED + "'exit' " +
-                        Color.BLUE + "to quit, or " + Color.YELLOW + "'save' " +
-                        Color.BLUE + "to save game): " + Color.RESET);
+                                 Color.BLUE + "to quit, or " + Color.YELLOW + "'save' " +
+                                 Color.BLUE + "to save game): " + Color.RESET);
                 String input = keyboard.nextLine().trim().toLowerCase();
 
                 if (input.equals("exit")) {
@@ -60,14 +60,12 @@ public class Player {
                 int col = Integer.parseInt(keyboard.nextLine().trim());
 
                 System.out.print(Color.BLUE + "Enter the value (" + Color.RED + "0 " + Color.BLUE + "or" +
-                        Color.RED + " 1" + Color.BLUE + "):" + Color.RESET);
+                                 Color.RED + " 1" + Color.BLUE + "):" + Color.RESET);
                 String value = Color.BLUE + keyboard.nextLine().trim() + Color.RESET;
 
-                if (!value.equals(Color.BLUE + "0" + Color.RESET) &&
-                        !value.equals(Color.BLUE + "1" + Color.RESET)) {
-                    System.out.println(Color.RED + "Invalid value! Please enter " +
-                            Color.GREEN + "0" + Color.RED + " or " +
-                            Color.GREEN + "1" + Color.RESET);
+                if (!value.equals(Color.BLUE + "0" + Color.RESET) && !value.equals(Color.BLUE + "1" + Color.RESET)) {
+                    System.out.println(Color.RED + "Invalid value! Please enter " + Color.GREEN + "0" +
+                                       Color.RED + " or " + Color.GREEN + "1" + Color.RESET);
                     continue;
                 }
 
@@ -80,7 +78,7 @@ public class Player {
                 }
             } catch (NumberFormatException e) {
                 System.out.println(Color.RED + "Invalid input! Please enter a valid number or " +
-                        Color.GREEN + "'exit'" + Color.RED + "/" + Color.GREEN + "'save'" + Color.RESET);
+                                   Color.GREEN + "'exit'" + Color.RED + "/" + Color.GREEN + "'save'" + Color.RESET);
             }
         }
 

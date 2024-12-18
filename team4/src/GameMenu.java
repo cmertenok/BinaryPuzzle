@@ -29,10 +29,10 @@ public class GameMenu {
                 keyboard.nextLine();
 
                 if (choice == 1) {
-                    handleEnterName(connection, keyboard);
+                    handleEnterName();
                     validateInput = false;
                 }else if (choice == 2) {
-                    handleSearchName(connection, keyboard);
+                    handleSearchName();
                     validateInput = false;
                 }else if (choice == 3) {
                     System.out.println(Color.BLUE + "Goodbye!" + Color.RESET);
@@ -51,7 +51,7 @@ public class GameMenu {
         handleMainMenu();
     }
 
-    public void handleEnterName(Connection connection, Scanner keyboard) throws SQLException {
+    public void handleEnterName() throws SQLException {
         boolean validateInput = true;
 
         while (validateInput) {
@@ -72,6 +72,7 @@ public class GameMenu {
 
                 String insertQuery = "INSERT INTO players (player_name, player_country) VALUES ('" + name + "' ,'" + country + "')";
                 try {
+                    Connection connection = DatabaseConnection.getConnection();
                     Statement statement = connection.createStatement();
                     int rowsInserted = statement.executeUpdate(insertQuery, Statement.RETURN_GENERATED_KEYS);
                     if (rowsInserted > 0) {
@@ -93,31 +94,45 @@ public class GameMenu {
         }
     }
 
-    public void handleSearchName(Connection connection, Scanner keyboard) throws SQLException {
-        System.out.println("List of an existing players: ");
+    public void handleSearchName() throws SQLException {
+        System.out.println(Color.BLUE + "List of an existing players: " + Color.RESET);
         String selectQuery = "SELECT * FROM players";
-        try (Statement statement = connection.createStatement()) {
+        try {
+            Connection connection = DatabaseConnection.getConnection();
+            Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(selectQuery);
             while (resultSet.next()) {
-                int playerId = resultSet.getInt("player_id");
+                String playerId = resultSet.getInt("player_id") + "";
                 String name = resultSet.getString("player_name");
-                System.out.printf("%-3s %5s%n", playerId, name);
+                System.out.printf("%-3s %5s%n", Color.RED + playerId, Color.YELLOW + name + Color.RESET);
             }
+            statement.close(); connection.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
-        System.out.print("Enter your ID: ");
-        String id = keyboard.nextLine();
-        String selectIdQuery = "SELECT * FROM players WHERE player_id = '" + id + "'";
-        try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(selectIdQuery);
-            if (resultSet.next()) {
-                String name = resultSet.getString("player_name");
-                String country = resultSet.getString("player_country");
-                System.out.println("Welcome back, " + name + "! From " + country + "!");
-                player = new Player(name);
-                player.setPlayerID(Integer.parseInt(id));
-            } else {
-                System.out.println("Wrong ID!");
+        while (true) {
+            System.out.print(Color.BLUE + "Enter your ID: " + Color.RESET);
+            String id = keyboard.nextLine();
+            String selectIdQuery = "SELECT * FROM players WHERE player_id = '" + id + "'";
+
+            try (Connection connection = DatabaseConnection.getConnection();
+                 Statement statement = connection.createStatement();
+                 ResultSet resultSet = statement.executeQuery(selectIdQuery)) {
+
+                if (resultSet.next()) {
+                    String name = resultSet.getString("player_name");
+                    String country = resultSet.getString("player_country");
+                    System.out.println(Color.BLUE + "Welcome back, " + Color.YELLOW + name +
+                                       Color.BLUE + " from " + Color.YELLOW + country + "!");
+                    player = new Player(name);
+                    player.setPlayerID(Integer.parseInt(id));
+                    break;
+                } else {
+                    System.out.println(Color.RED + "Wrong ID! Please try again." + Color.RESET);
+                }
+            } catch (SQLException e) {
+                System.out.println(Color.RED + "Wrong ID! Please try again." + Color.RESET);
             }
         }
     }
@@ -320,7 +335,6 @@ public class GameMenu {
     }
 
     public void displayLeaderboard() {
-        Scanner scanner = new Scanner(System.in);
 
         System.out.println(Color.YELLOW + "══════ LeaderBoard ═════" + Color.RESET);
         String showTop = "SELECT p.player_name, g.score\n" +
@@ -356,7 +370,7 @@ public class GameMenu {
         while (true) {
             System.out.println(Color.YELLOW + "Enter name to see more, or type " + Color.RED + "'menu' " +
                                Color.YELLOW + "to return to menu: " + Color.RESET);
-            String input = scanner.nextLine().trim();
+            String input = keyboard.nextLine().trim();
 
             if (input.toLowerCase().equals("menu")) {
                 handleMainMenu();
