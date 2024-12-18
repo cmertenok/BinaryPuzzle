@@ -25,7 +25,7 @@ public class Board {
     }
 
     public void generateStartValues() {
-        String value = GameMenu.RED + rand.nextInt(2) + GameMenu.RESET;
+        String value = Color.RED.toString() + rand.nextInt(2) + Color.RESET;
         int randomRow, randomCol;
 
         do {
@@ -49,10 +49,10 @@ public class Board {
     }
 
     public void saveBoard(int gameID) {
+        String deleteQuery = "DELETE FROM board_state;";
         try {
-            Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
+            Connection connection = DatabaseConnection.getConnection();
             Statement statement = connection.createStatement();
-            String deleteQuery = "DELETE FROM board_state;";
             statement.executeUpdate(deleteQuery);
 
             for (int i = 1; i <= BOARD_SIZE; i++) {
@@ -60,27 +60,25 @@ public class Board {
                     Cell cell = gameBoard[i][j];
                     String cellValue = cell.getValue();
                     int cellIsLocked = cell.isLocked() ? 1 : 0;
-
                     String insertQuery = "INSERT INTO board_state (game_id, cell_row, cell_column, value, static) " +
                                          "VALUES (" + gameID + ", " + i + ", " + j + ", '" + cellValue + "', " + cellIsLocked + ")";
                     statement.executeUpdate(insertQuery);
                 }
             }
 
-            statement.close();
-            connection.close();
+            statement.close(); connection.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     public void loadBoard() {
+        String selectQuery = "SELECT cell_row, cell_column, value, static\n" +
+                             "FROM board_state\n" +
+                             "ORDER BY cell_row, cell_column;";
         try {
-            Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
+            Connection connection = DatabaseConnection.getConnection();
             Statement statement = connection.createStatement();
-            String selectQuery = "SELECT cell_row, cell_column, value, static\n" +
-                                 "FROM board_state\n" +
-                                 "ORDER BY cell_row, cell_column;";
             ResultSet resultSet = statement.executeQuery(selectQuery);
 
             while(resultSet.next()) {
@@ -100,8 +98,7 @@ public class Board {
                 }
             }
 
-            statement.close();
-            connection.close();
+            statement.close(); connection.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

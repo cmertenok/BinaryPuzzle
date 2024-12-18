@@ -38,49 +38,49 @@ public class Player {
 
         while (!validMove) {
             try {
-                System.out.print(GameMenu.BLUE + "Enter the row (" + GameMenu.RED + "'exit' " +
-                        GameMenu.BLUE + "to quit, or " + GameMenu.YELLOW + "'save' " +
-                        GameMenu.BLUE + "to save game): " + GameMenu.RESET);
+                System.out.print(Color.BLUE + "Enter the row (" + Color.RED + "'exit' " +
+                        Color.BLUE + "to quit, or " + Color.YELLOW + "'save' " +
+                        Color.BLUE + "to save game): " + Color.RESET);
                 String input = keyboard.nextLine().trim().toLowerCase();
 
                 if (input.equals("exit")) {
-                    System.out.println(GameMenu.RED + "Exiting the game." + GameMenu.RESET);
+                    System.out.println(Color.RED + "Exiting the game." + Color.RESET);
                     return false;
                 }
 
                 if (input.equals("save")) {
                     gameSession.getBoard().saveBoard(gameSession.getGameID());
-                    System.out.println(GameMenu.GREEN + "Game has been saved!" + GameMenu.RESET);
+                    System.out.println(Color.GREEN + "Game has been saved!" + Color.RESET);
                     return false;
                 }
 
                 int row = Integer.parseInt(input);
 
-                System.out.print(GameMenu.BLUE + "Enter the column: " + GameMenu.RESET);
+                System.out.print(Color.BLUE + "Enter the column: " + Color.RESET);
                 int col = Integer.parseInt(keyboard.nextLine().trim());
 
-                System.out.print(GameMenu.BLUE + "Enter the value (" + GameMenu.RED + "0 " + GameMenu.BLUE + "or" +
-                        GameMenu.RED + " 1" + GameMenu.BLUE + "):" + GameMenu.RESET);
-                String value = GameMenu.BLUE + keyboard.nextLine().trim() + GameMenu.RESET;
+                System.out.print(Color.BLUE + "Enter the value (" + Color.RED + "0 " + Color.BLUE + "or" +
+                        Color.RED + " 1" + Color.BLUE + "):" + Color.RESET);
+                String value = Color.BLUE + keyboard.nextLine().trim() + Color.RESET;
 
-                if (!value.equals(GameMenu.BLUE + "0" + GameMenu.RESET) &&
-                        !value.equals(GameMenu.BLUE + "1" + GameMenu.RESET)) {
-                    System.out.println(GameMenu.RED + "Invalid value! Please enter " +
-                            GameMenu.GREEN + "0" + GameMenu.RED + " or " +
-                            GameMenu.GREEN + "1" + GameMenu.RESET);
+                if (!value.equals(Color.BLUE + "0" + Color.RESET) &&
+                        !value.equals(Color.BLUE + "1" + Color.RESET)) {
+                    System.out.println(Color.RED + "Invalid value! Please enter " +
+                            Color.GREEN + "0" + Color.RED + " or " +
+                            Color.GREEN + "1" + Color.RESET);
                     continue;
                 }
 
                 validMove = board.validateMove(row, col, value);
                 if (!validMove) {
-                    System.out.println(GameMenu.RED + "Invalid move! Cell is locked or the coordinates are out of bounds." + GameMenu.RESET);
+                    System.out.println(Color.RED + "Invalid move! Cell is locked or the coordinates are out of bounds." + Color.RESET);
                 } else {
                     moves++;
-                    System.out.println(GameMenu.GREEN + "Move successful!" + GameMenu.RESET);
+                    System.out.println(Color.GREEN + "Move successful!" + Color.RESET);
                 }
             } catch (NumberFormatException e) {
-                System.out.println(GameMenu.RED + "Invalid input! Please enter a valid number or " +
-                        GameMenu.GREEN + "'exit'" + GameMenu.RED + "/" + GameMenu.GREEN + "'save'" + GameMenu.RESET);
+                System.out.println(Color.RED + "Invalid input! Please enter a valid number or " +
+                        Color.GREEN + "'exit'" + Color.RED + "/" + Color.GREEN + "'save'" + Color.RESET);
             }
         }
 
@@ -89,6 +89,6 @@ public class Player {
 
     @Override
     public String toString() {
-        return String.format(GameMenu.GREEN + "\nSteps:" + GameMenu.RED + " %d" + GameMenu.RESET, moves);
+        return String.format(Color.GREEN + "\nSteps:" + Color.RED + " %d" + Color.RESET, moves);
     }
 }

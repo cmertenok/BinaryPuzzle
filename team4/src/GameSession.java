@@ -40,7 +40,7 @@ public class GameSession {
 
     public void updateSessionDuration() {
         try {
-            Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
+            Connection connection = DatabaseConnection.getConnection();
             Statement statement = connection.createStatement();
 
             String selectQuery = "SELECT session_duration FROM game_info WHERE game_id = " + gameID;
@@ -59,6 +59,7 @@ public class GameSession {
 
             endTime = now;
 
+            statement.close(); connection.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
