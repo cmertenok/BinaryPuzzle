@@ -114,12 +114,12 @@ public class GameSession {
         for (int i = 1; i <= Board.BOARD_SIZE; i++) {
             for (int j = 1; j <= Board.BOARD_SIZE - 2; j++) {
                 if (removeColor(i, j) == removeColor(i, j + 1) &&
-                    removeColor(i, j) == removeColor(i, j + 2)) {
+                        removeColor(i, j) == removeColor(i, j + 2)) {
                     return false;
                 }
 
                 if (removeColor(j, i) == removeColor(j + 1, i) &&
-                    removeColor(j, i) == removeColor(j + 2, i)) {
+                        removeColor(j, i) == removeColor(j + 2, i)) {
                     return false;
                 }
             }

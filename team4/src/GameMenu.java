@@ -305,21 +305,21 @@ public class GameMenu {
 
     public void displayMainMenu() {
         System.out.println(YELLOW + "\n╔══════ Binary Puzzle ═════╗\n" +
-                                      "║     1. New Game          ║\n" +
-                                      "║     2. Continue Game     ║\n" +
-                                      "║     3. LeaderBoard       ║\n" +
-                                      "║     4. Rules             ║\n" +
-                                      "║     5. Exit              ║\n" +
-                                      "╚══════════════════════════╝  " + RESET);
+                "║     1. New Game          ║\n" +
+                "║     2. Continue Game     ║\n" +
+                "║     3. LeaderBoard       ║\n" +
+                "║     4. Rules             ║\n" +
+                "║     5. Exit              ║\n" +
+                "╚══════════════════════════╝  " + RESET);
     }
 
     public void displayRules() {
         System.out.println(CYAN + "╔════════════════════════ How to Play ══════════════════════════╗\n" +
-                                  "║   1. Fill the grid with 0s and 1s.                            ║\n" +
-                                  "║   2. No more than two of the same number in a row or column.  ║\n" +
-                                  "║   3. Equal numbers of 0s and 1s in each row and column.       ║\n" +
-                                  "║   4. Rows and columns must be unique.                         ║\n" +
-                                  "╚═══════════════════════════════════════════════════════════════╝"   + RESET);
+                "║   1. Fill the grid with 0s and 1s.                            ║\n" +
+                "║   2. No more than two of the same number in a row or column.  ║\n" +
+                "║   3. Equal numbers of 0s and 1s in each row and column.       ║\n" +
+                "║   4. Rows and columns must be unique.                         ║\n" +
+                "╚═══════════════════════════════════════════════════════════════╝"   + RESET);
     }
 
     public void displayLeaderboard() {
