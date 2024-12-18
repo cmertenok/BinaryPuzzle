@@ -135,18 +135,21 @@ public class GameMenu {
         while (validInput) {
             displayMainMenu();
 
-            try {
-                System.out.print(BLUE + "Your choice: " + RESET);
-                choice = keyboard.nextInt();
-                keyboard.nextLine();
+            System.out.print(BLUE + "Your choice: " + RESET);
+            String input = keyboard.nextLine().trim();
 
+            try {
+                choice = Integer.parseInt(input);
                 switch (choice) {
                     case 1:
-                        startNewGame();
+                        startGame(null);
                         validInput = false;
                         break;
                     case 2:
-
+                        Board board = new Board();
+                        board.loadBoard();
+                        startGame(board);
+                        validInput = false;
                         break;
                     case 3:
                         displayLeaderboard();
@@ -161,17 +164,38 @@ public class GameMenu {
                     default:
                         System.out.println(RED + "Invalid input! Please enter number from 1 to 5." + RESET);
                 }
-            } catch (Exception e) {
+            } catch (NumberFormatException e) {
                 System.out.println(RED + "Invalid input! Please enter number from 1 to 5." + RESET);
-                keyboard.nextLine();
             }
         }
     }
 
-    public void startNewGame() {
+    public void startGame(Board board) {
         gameSession = new GameSession();
         player.setGameSession(gameSession);
-        initializeGame();
+
+        if (board == null) {
+            initializeGame();
+        } else {
+            int loadedGameID = getSavedGameID();
+            try {
+                Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery("SELECT score FROM game_info WHERE game_id = " + loadedGameID + ";");
+                if (resultSet.next()) {
+                    player.setMoves(resultSet.getInt("score"));
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            if (loadedGameID == -1) {
+                System.out.println(RED + "You don't have any saves!" + RESET);
+                return;
+            }
+
+            gameSession.setGameID(loadedGameID);
+            gameSession.setBoard(board);
+        }
 
         System.out.println(player.toString());
         System.out.print(gameSession.getBoard());
@@ -182,15 +206,13 @@ public class GameMenu {
                 return;
             }
 
-            try {
-                Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
-                Statement statement = connection.createStatement();
+            try (Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
+                 Statement statement = connection.createStatement()) {
 
-                String updateScoreQuery = "UPDATE game_info SET score = " + player.getMovesAmount() + " WHERE game_id = " + gameSession.getGameID();
+                String updateScoreQuery = "UPDATE game_info SET score = " + player.getMovesAmount() +
+                        " WHERE game_id = " + gameSession.getGameID();
                 statement.executeUpdate(updateScoreQuery);
 
-                statement.close();
-                connection.close();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -199,9 +221,8 @@ public class GameMenu {
             System.out.println(gameSession.getBoard());
         }
 
-        try {
-            Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
-            Statement statement = connection.createStatement();
+        try (Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
+             Statement statement = connection.createStatement()) {
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             String endDate = LocalDateTime.now().format(formatter);
@@ -222,15 +243,30 @@ public class GameMenu {
             }
 
             player.setMoves(0);
-
-            statement.close();
-            connection.close();
-
             handleMainMenu();
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public int getSavedGameID() {
+        int id = -1;
+        try {
+            Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT game_id FROM board_state FETCH FIRST ROW ONLY");
+            if (resultSet.next()) {
+                id = resultSet.getInt("game_id");
+            }
+
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return id;
     }
 
     public void initializeGame() {
@@ -262,21 +298,21 @@ public class GameMenu {
 
     public void displayMainMenu() {
         System.out.println(YELLOW + "\n╔══════ Binary Puzzle ═════╗\n" +
-                                      "║     1. New Game          ║\n" +
-                                      "║     2. Continue Game     ║\n" +
-                                      "║     3. LeaderBoard       ║\n" +
-                                      "║     4. Rules             ║\n" +
-                                      "║     5. Exit              ║\n" +
-                                      "╚══════════════════════════╝  " + RESET);
+                "║     1. New Game          ║\n" +
+                "║     2. Continue Game     ║\n" +
+                "║     3. LeaderBoard       ║\n" +
+                "║     4. Rules             ║\n" +
+                "║     5. Exit              ║\n" +
+                "╚══════════════════════════╝  " + RESET);
     }
 
     public void displayRules() {
         System.out.println(CYAN + "╔════════════════════════ How to Play ══════════════════════════╗\n" +
-                                  "║   1. Fill the grid with 0s and 1s.                            ║\n" +
-                                  "║   2. No more than two of the same number in a row or column.  ║\n" +
-                                  "║   3. Equal numbers of 0s and 1s in each row and column.       ║\n" +
-                                  "║   4. Rows and columns must be unique.                         ║\n" +
-                                  "╚═══════════════════════════════════════════════════════════════╝"   + RESET);
+                "║   1. Fill the grid with 0s and 1s.                            ║\n" +
+                "║   2. No more than two of the same number in a row or column.  ║\n" +
+                "║   3. Equal numbers of 0s and 1s in each row and column.       ║\n" +
+                "║   4. Rows and columns must be unique.                         ║\n" +
+                "╚═══════════════════════════════════════════════════════════════╝"   + RESET);
     }
 
     public void displayLeaderboard() {

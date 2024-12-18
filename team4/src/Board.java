@@ -1,7 +1,4 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Random;
 
 public class Board {
@@ -60,12 +57,6 @@ public class Board {
             Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
             Statement statement = connection.createStatement();
             String deleteQuery = "DELETE FROM board_state;";
-//            String deleteQuery = "DELETE FROM board_state\n" +
-//                    "WHERE game_id IN (\n" +
-//                    "    SELECT b.game_id\n" +
-//                    "    FROM board_state b\n" +
-//                    "    JOIN game_info g ON g.game_id = b.game_id\n" +
-//                    "    WHERE g.player_id = " + playerID + ");";
             statement.executeUpdate(deleteQuery);
 
             for (int i = 1; i <= BOARD_SIZE; i++) {
@@ -75,7 +66,7 @@ public class Board {
                     int cellIsLocked = cell.isLocked() ? 1 : 0;
 
                     String insertQuery = "INSERT INTO board_state (game_id, cell_row, cell_column, value, static) " +
-                                         "VALUES (" + gameID + ", " + i + ", " + j + ", '" + cellValue + "', " + cellIsLocked + ")";
+                            "VALUES (" + gameID + ", " + i + ", " + j + ", '" + cellValue + "', " + cellIsLocked + ")";
                     statement.executeUpdate(insertQuery);
                 }
             }
@@ -88,7 +79,36 @@ public class Board {
     }
 
     public void loadBoard() {
-        //TODO implement loading board
+        try {
+            Connection connection = DriverManager.getConnection(DatabaseConnection.url, DatabaseConnection.user, DatabaseConnection.password);
+            Statement statement = connection.createStatement();
+            String selectQuery = "SELECT cell_row, cell_column, value, static\n" +
+                    "FROM board_state\n" +
+                    "ORDER BY cell_row, cell_column;";
+            ResultSet resultSet = statement.executeQuery(selectQuery);
+
+            while(resultSet.next()) {
+                int row = resultSet.getInt("cell_row");
+                int col = resultSet.getInt("cell_column");
+                String value = resultSet.getString("value");
+                int isStatic = resultSet.getInt("static");
+
+                Cell cell = gameBoard[row][col];
+                cell.setLocked(false);
+                cell.setValue(value);
+
+                if (isStatic == 1) {
+                    cell.setLocked(true);
+                } else {
+                    cell.setLocked(false);
+                }
+            }
+
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
