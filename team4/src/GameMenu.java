@@ -24,7 +24,6 @@ public class GameMenu {
             System.out.print(Color.BLUE + "Your choice: " + Color.RESET);
 
             try {
-                Connection connection = DatabaseConnection.getConnection();
                 choice = keyboard.nextInt();
                 keyboard.nextLine();
 
